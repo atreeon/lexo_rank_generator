@@ -1,4 +1,4 @@
-import 'package:lexo_rank_generator/src/helpers.dart';
+import 'package:lexo_rank_generator/src/LexoRankListHelper.dart';
 import 'package:test/test.dart';
 
 var _personHelper = LexoRankListHelper(

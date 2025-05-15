@@ -3,6 +3,11 @@ import 'package:lexo_rank_generator/lexo_rank_generator.dart';
 
 enum MoveDirection { up, down }
 
+/// A helper class to move items in a list
+///
+/// We don't check to see if the item is in the list
+/// nor if we are trying to move items outside of the bounds of the list.
+/// These actions should be done before calling this class.
 class LexoRankListHelper<T, TId> {
   final TId Function(T) getId;
   final String Function(T) getRankStr;
@@ -10,12 +15,15 @@ class LexoRankListHelper<T, TId> {
 
   LexoRankListHelper({required this.getId, required this.getRankStr, required this.setRankStr});
 
+  /// Moves an item in a list of items
+  /// Returning a new list with the item moved and with a new rank
   List<T> moveItemInList(List<T> list, T item, MoveDirection moveDirection) {
     var newItem = moveItem(list, item, MoveDirection.up);
     var updatedList = list.map((x) => getId(x) == getId(newItem) ? newItem : x).sortedBy((x) => getRankStr(x)).toList();
     return updatedList;
   }
 
+  /// Moves multiple items in a list of items
   List<T> moveItemsInList(List<T> list, List<T> itemsToMove, MoveDirection moveDirection) {
     var newItems = moveItems(list, itemsToMove, moveDirection);
 
@@ -102,34 +110,3 @@ class LexoRankListHelper<T, TId> {
     return newItem;
   }
 }
-
-// //move down
-// T moveUpInListSingleItem<T, TId>(List<T> list,
-//     T item,
-//     TId Function(T) getId,
-//     String Function(T) getRankStr,
-//     T Function(String) setRankStr,) {}
-
-//move multiple
-
-//move up in list single item (only return the item that has moved)
-// T moveUpInListSingleItem<T, TId>(
-//   List<T> list,
-//   T item,
-//   TId Function(T) getId,
-//   String Function(T) getRankStr,
-//   T Function(String) setRankStr,
-// ) {
-//   final lexo = const LexoRank();
-//   var itemId = getId(item);
-//   var index = list.indexWhere((x) => getId(x) == itemId);
-//
-//   var rankAboveNew = getRankStr(list[index - 2]);
-//   var rankBelowNew = getRankStr(list[index - 1]);
-//
-//   var newId = lexo.getRankBetween(firstRank: rankAboveNew, secondRank: rankBelowNew);
-//
-//   var newItem = setRankStr(newId);
-//
-//   return newItem;
-// }
