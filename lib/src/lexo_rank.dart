@@ -150,22 +150,23 @@ class LexoRank {
       throw LexoRankException('letters cannot be the same');
     }
 
-    // var toPrepend = '';
-    // while (startRandPos == endRankPos) {
-    //   toPrepend += startRankLetter[0];
-    //
-    //   startRankLetter = startRankLetter.substring(1);
-    //   endRankLetter = endRankLetter.substring(1);
-    //
-    //   rankLength--;
-    //
-    //   if (startRankLetter.isEmpty || endRankLetter.isEmpty) {
-    //     throw LexoRankException('Need to rebalance');
-    //   }
-    //
-    //   startRandPos = startRankLetter.codeUnits.first;
-    //   endRankPos = endRankLetter.codeUnits.first;
-    // }
+    // ignore: unused_local_variable
+    var toPrepend = '';
+    while (startRandPos == endRankPos) {
+      toPrepend += startRankLetter[0];
+
+      startRankLetter = startRankLetter.substring(1);
+      endRankLetter = endRankLetter.substring(1);
+
+      rankLength--;
+
+      if (startRankLetter.isEmpty || endRankLetter.isEmpty) {
+        throw LexoRankException('Need to rebalance');
+      }
+
+      startRandPos = startRankLetter.codeUnits.first;
+      endRankPos = endRankLetter.codeUnits.first;
+    }
 
     final items = <String>[];
     for (int i = startRandPos; i < endRankPos + 1; i++) {
@@ -179,8 +180,7 @@ class LexoRank {
       items.sort();
     }
 
-    // return items.map((x) => toPrepend + x).toSet().toList();
-    return items.toSet().toList();
+    return items.map((x) => toPrepend + x).toSet().take(sizeOfItems).toList();
   }
 
   /// Generate id between each two item in the list.

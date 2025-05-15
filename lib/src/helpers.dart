@@ -16,28 +16,68 @@ class LexoRankListHelper<T, TId> {
     return updatedList;
   }
 
+  List<T> moveItemsInList(List<T> list, List<T> itemsToMove, MoveDirection moveDirection) {
+    var newItems = moveItems(list, itemsToMove, moveDirection);
+
+    var updatedList = list //
+        .map((x) => newItems.firstOrNullWhere((y) => getId(x) == getId(y)) != null ? newItems.firstWhere((y) => getId(x) == getId(y)) : x)
+        .sortedBy((x) => getRankStr(x))
+        .toList();
+    return updatedList;
+  }
+
   /// If we move multiple items
   /// We take the first item to be moved and then move all our items above that one
   List<T> moveItems(
-      List<T> list,
-      List<T> items,
-      MoveDirection direction,
-      ) {
+    List<T> list,
+    List<T> itemsToMove,
+    MoveDirection direction,
+  ) {
+    var rankLength = 12;
+
+    if (list.isEmpty) {
+      throw LexoRankException('Minimum of 1 item required');
+    }
+
     final lexo = const LexoRank();
-    var itemId = getId(items.first);
+    // var itemId = getId(itemsToMove.first);
+
+    var itemId = direction == MoveDirection.up ? getId(itemsToMove.first) : getId(itemsToMove.last);
+
     var index = list.indexWhere((x) => getId(x) == itemId);
 
     var aboveNewPositionIndex = index + (direction == MoveDirection.up ? -2 : 1);
     var belowNewPositionIndex = index + (direction == MoveDirection.up ? -1 : 2);
 
-    var rankAboveNew = getRankStr(list[aboveNewPositionIndex]);
-    var rankBelowNew = getRankStr(list[belowNewPositionIndex]);
+    var rankAboveNew = aboveNewPositionIndex < 0 //
+        ? List.generate(rankLength, (_) => 'a').join()
+        : getRankStr(list[aboveNewPositionIndex]);
 
-    var newId = lexo.getRankBetween(firstRank: rankAboveNew, secondRank: rankBelowNew);
+    var rankBelowNew = belowNewPositionIndex >= list.length //
+        ? List.generate(rankLength, (_) => 'z').join()
+        : getRankStr(list[belowNewPositionIndex]);
 
-    var newItem = setRankStr(item, newId);
+    if (list.length == 1) {
+      var newId = lexo.getRankBetween(firstRank: rankAboveNew, secondRank: rankBelowNew);
+      var newItem = setRankStr(itemsToMove.first, newId);
+      return [newItem];
+    } else {
+      var ranks = lexo.generateInitialRank(
+        sizeOfItems: itemsToMove.length + 2,
+        rankLength: rankLength,
+        startRankLetter: rankAboveNew,
+        endRankLetter: rankBelowNew,
+      );
 
-    return newItem;
+      var newItems = itemsToMove.map((item) {
+        var itemId = getId(item);
+        var index = itemsToMove.indexWhere((x) => getId(x) == itemId);
+        var rank = ranks[index + 1];
+        return setRankStr(item, rank);
+      }).toList();
+
+      return newItems;
+    }
   }
 
   T moveItem(
