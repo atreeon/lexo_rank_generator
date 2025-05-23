@@ -1,3 +1,4 @@
+import 'package:dartx/dartx.dart';
 import 'package:lexo_rank_generator/lexo_rank_generator.dart';
 import 'package:test/test.dart';
 
@@ -92,6 +93,5 @@ void main() {
       var list = lexo.generateInitialRank(sizeOfItems: 500, rankLength: 10, startRankLetter: 'aaa', endRankLetter: 'zzz');
       list.forEach((x) => print(x));
     });
-
   });
 }

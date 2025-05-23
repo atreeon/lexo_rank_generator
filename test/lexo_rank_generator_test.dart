@@ -85,5 +85,35 @@ void main() {
       final stats = lexo.shouldRebalanced(items, maxRankLength: 5);
       expect(stats.exceeded, isFalse);
     });
+
+    test('bug 1', () {
+      final lexo = const LexoRank();
+      final items = lexo.generateInitialRank(
+        sizeOfItems: 3,
+        rankLength: 12,
+        startRankLetter: 'aaaaaaaaannn',
+        endRankLetter: 'aaaaaaaabbbb',
+        // startRankLetter: 'aaaaaaaaannn',
+        // endRankLetter: 'aaaaaaaabbbb',
+      );
+
+      print(items);
+
+      expect(items[1], 'aaaaaaaaaxxx');
+    });
+
+    test('bug 2', () {
+      final lexo = const LexoRank();
+      final items = lexo.generateInitialRank(
+        sizeOfItems: 3,
+        rankLength: 12,
+        startRankLetter: 'aab',
+        endRankLetter: 'acc',
+      );
+
+      print(items);
+
+      throw Exception('Test failed');
+    });
   });
 }

@@ -12,8 +12,47 @@ class LexoRankListHelper<T, TId> {
   final TId Function(T) getId;
   final String Function(T) getRankStr;
   final T Function(T, String) setRankStr;
+  final int rankLength;
 
-  LexoRankListHelper({required this.getId, required this.getRankStr, required this.setRankStr});
+  LexoRankListHelper({
+    required this.getId,
+    required this.getRankStr,
+    required this.setRankStr,
+    this.rankLength = 12,
+  });
+
+  /// Creates a new rank after the selected id
+  String createPositionedRank(List<T> list, TId? createAfterItemId) {
+    if (list.isEmpty) {
+      return List.generate(rankLength, (_) => 'm').join();
+    }
+
+    final lexo = const LexoRank();
+
+    if (list.length == 1) {
+      //regardless if we have one selected or not we will always add it after
+      var rankBelow = getRankStr(list.first);
+      var rankAfter = List.generate(rankLength, (_) => 'z').join();
+      var newRank = lexo.getRankBetween(firstRank: rankBelow, secondRank: rankAfter);
+      return newRank;
+    }
+
+    createAfterItemId ??= getId(list.last);
+    var indexOfCreateAfterItemId = list.indexWhere((x) => getId(x) == createAfterItemId);
+
+    if (indexOfCreateAfterItemId >= list.length - 1) {
+      //create after the last item
+      var rankBelow = getRankStr(list[indexOfCreateAfterItemId]);
+      var rankAfter = List.generate(rankLength, (_) => 'z').join();
+      var newRank = lexo.getRankBetween(firstRank: rankBelow, secondRank: rankAfter);
+      return newRank;
+    }
+
+    var rankBelow = getRankStr(list[indexOfCreateAfterItemId]);
+    var rankAfter = getRankStr(list[indexOfCreateAfterItemId + 1]);
+    var newRank = lexo.getRankBetween(firstRank: rankBelow, secondRank: rankAfter);
+    return newRank;
+  }
 
   /// Moves an item in a list of items
   /// Returning a new list with the item moved and with a new rank
@@ -24,14 +63,14 @@ class LexoRankListHelper<T, TId> {
   }
 
   /// Moves multiple items in a list of items
-  List<T> moveItemsInList(List<T> list, List<T> itemsToMove, MoveDirection moveDirection) {
+  ({List<T> list, List<T> itemsMoved}) moveItemsInList(List<T> list, List<T> itemsToMove, MoveDirection moveDirection) {
     var newItems = moveItems(list, itemsToMove, moveDirection);
 
     var updatedList = list //
         .map((x) => newItems.firstOrNullWhere((y) => getId(x) == getId(y)) != null ? newItems.firstWhere((y) => getId(x) == getId(y)) : x)
         .sortedBy((x) => getRankStr(x))
         .toList();
-    return updatedList;
+    return (list: updatedList, itemsMoved: newItems);
   }
 
   /// If we move multiple items
@@ -41,8 +80,6 @@ class LexoRankListHelper<T, TId> {
     List<T> itemsToMove,
     MoveDirection direction,
   ) {
-    var rankLength = 12;
-
     if (list.isEmpty) {
       throw LexoRankException('Minimum of 1 item required');
     }
