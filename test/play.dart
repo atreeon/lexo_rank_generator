@@ -1,6 +1,10 @@
-import 'package:dartx/dartx.dart';
+// ignore_for_file: deprecated_member_use_from_same_package
+
 import 'package:lexo_rank_generator/lexo_rank_generator.dart';
 import 'package:test/test.dart';
+
+import 'support/EList.dart';
+import 'support/Person.dart';
 
 void main() {
   group("mytests", () {
@@ -8,34 +12,20 @@ void main() {
       final lexo = const LexoRank();
 
       var list = lexo.generateInitialRank(sizeOfItems: 30);
-      list.forEach((x) => print(x));
-    });
-
-    test("1", () {
-      final lexo = const LexoRank();
-      String secondRank = 'c';
-      final items = <String>[];
-      for (int i = 0; i < 100; i++) {
-        final rank = lexo.getRankBetween(firstRank: 'a', secondRank: secondRank);
-        secondRank = rank;
-        items.add(rank);
-      }
-
-      items.forEach((x) => print(x));
-
-      final stats = lexo.shouldRebalanced(items, maxRankLength: 20);
-      print(stats);
+      list.printLines();
     });
 
     test("previous", () {
       final lexo = const LexoRank();
-      final rank = lexo.prevLexo('aabbb');
 
-      print(rank);
+      print(lexo.prevLexo('aabbb'));
+      print(lexo.prevLexo('aabba'));
+      print(lexo.prevLexo('aabb'));
+      print(lexo.prevLexo('aaann'));
 
       //prob don't do the above, always compare to the beggining of the string
-      final rank2 = lexo.getRankBetween(firstRank: "a", secondRank: 'aabbb');
-      print(rank2);
+      final rank3 = lexo.getRankBetween(firstRank: "a", secondRank: 'aabbb');
+      print(rank3);
     });
 
     test("next", () {
@@ -86,6 +76,29 @@ void main() {
       list.sort();
 
       list.forEach((x) => print(x));
+    });
+
+    test("5 bug - first is a", () {
+      var people = [
+        Person(1, "Mine", 25, "aaaaaaaaaaaaaa"),
+        Person(2, "Rich", 30, "bbb"),
+        Person(3, "Doe", 28, "ccc"),
+      ];
+
+      var _personHelper = LexoRankListHelper(
+        getId: (Person p) => p.id,
+        getRankStr: (Person p) => p.rank,
+        setRankStr: (Person p, String newRank) => p.copyWith(rank: newRank),
+        minRankLengthForNewList: 12,
+      );
+
+      _personHelper.moveMultiInList(
+        people,
+        [
+          Person(2, "Rich", 28, "bbb"),
+        ],
+        MoveDirection.up,
+      );
     });
 
     test("generateInitialRank", () {

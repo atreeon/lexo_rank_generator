@@ -27,7 +27,7 @@ class LexoRank {
   /// default is false
   final bool reorderPosition;
 
-  /// Generate a lexo rank between two rank.
+  /// Generate a lexo rank between two ranks.
   ///
   /// the [firstRank] should be lower than the [secondRank] unless the [reorderPosition] is true
   // inspired by https://medium.com/whisperarts/lexorank-what-are-they-and-how-to-use-them-for-efficient-list-sorting-a48fc4e7849f
@@ -104,6 +104,7 @@ class LexoRank {
   }
 
   /// Generates the next lexicographically ranked string based on the input string.
+  @Deprecated('use [getRankBetween]')
   String nextLexo(String current) {
     final lastChar = current[current.length - 1];
     if (lastChar == 'z') {
@@ -117,6 +118,7 @@ class LexoRank {
   }
 
   /// Generates the previous lexicographically ranked string based on the input string.
+  @Deprecated('use [getRankBetween]')
   String prevLexo(String current) {
     final lastChar = current[current.length - 1];
     if (lastChar == 'a') {
@@ -129,6 +131,12 @@ class LexoRank {
 
   /// Generate a list of initial rank for re-balancing items
   ///
+  /// If we have less than [rankLength] x 26 items
+  ///   then we should have a max & min of [rankLength] length rank
+  ///
+  /// If we have more than [rankLength] x 26 items
+  ///  then we can have a rank greater in size than [rankLength] but not less than [rankLength]
+  ///
   /// [sizeOfItems] indicate number of ranks that must be generated
   /// [rankLength] specify initial base rank letter size, default to 5
   /// [startRankLetter] specify start letter to generate the initial the base rank, default is 'a'
@@ -139,33 +147,11 @@ class LexoRank {
     String startRankLetter = 'a',
     String endRankLetter = 'z',
   }) {
-    var startRandPos = startRankLetter.codeUnits.first;
-    var endRankPos = endRankLetter.codeUnits.first;
+    final startRandPos = startRankLetter.codeUnits.first;
+    final endRankPos = endRankLetter.codeUnits.first;
 
     if (startRandPos < 'a'.codeUnits.first || endRankPos > 'z'.codeUnits.first) {
       throw LexoRankException('Only support letter from `a` to `z`');
-    }
-
-    if (startRankLetter == endRankLetter) {
-      throw LexoRankException('letters cannot be the same');
-    }
-
-    // ignore: unused_local_variable
-    var toPrepend = '';
-    while (startRandPos == endRankPos) {
-      toPrepend += startRankLetter[0];
-
-      startRankLetter = startRankLetter.substring(1);
-      endRankLetter = endRankLetter.substring(1);
-
-      rankLength--;
-
-      if (startRankLetter.isEmpty || endRankLetter.isEmpty) {
-        throw LexoRankException('Need to rebalance');
-      }
-
-      startRandPos = startRankLetter.codeUnits.first;
-      endRankPos = endRankLetter.codeUnits.first;
     }
 
     final items = <String>[];
@@ -179,8 +165,7 @@ class LexoRank {
       items.addAll(newList);
       items.sort();
     }
-
-    return items.map((x) => toPrepend + x).toSet().take(sizeOfItems).toList();
+    return items.toSet().take(sizeOfItems).toList();
   }
 
   /// Generate id between each two item in the list.
@@ -201,9 +186,16 @@ class LexoRank {
 
   /// Check if a list should be re-balanced or not depend on max rank length
   /// that exceed the [maxThreshold] of total items.
+  ///
+  /// True - if % of items exceeding [maxRankLength] is greater than the [maxThreshold]
+  /// ie, if 50% of items exceed the max rank length then it should be re-balanced
+  ///
+  /// It does not check how close the items are to each other.
   LexoRankItemsStat shouldRebalanced(
     List<String> items, {
     required int maxRankLength,
+
+    ///0.5 means that 50% of the values must exceed the length
     double maxThreshold = 0.5,
   }) {
     final exceedItems = items.where((e) => e.length > maxRankLength).toList();
@@ -281,3 +273,59 @@ extension LexoListExt<T> on List<T> {
     return stats;
   }
 }
+
+// /// Generate a list of initial rank for re-balancing items
+// ///
+// /// [sizeOfItems] indicate number of ranks that must be generated
+// /// [rankLength] specify initial base rank letter size, default to 5
+// /// [startRankLetter] specify start letter to generate the initial the base rank, default is 'a'
+// /// [endRankLetter] specify end letter to generate the initial the base rank, default is 'z'
+// List<String> generateInitialRank({
+//   required int sizeOfItems,
+//   int rankLength = 5,
+//   String startRankLetter = 'a',
+//   String endRankLetter = 'z',
+// }) {
+//   var startRandPos = startRankLetter.codeUnits.first;
+//   var endRankPos = endRankLetter.codeUnits.first;
+//
+//   if (startRandPos < 'a'.codeUnits.first || endRankPos > 'z'.codeUnits.first) {
+//     throw LexoRankException('Only support letter from `a` to `z`');
+//   }
+//
+//   if (startRankLetter == endRankLetter) {
+//     throw LexoRankException('letters cannot be the same');
+//   }
+//
+//   // ignore: unused_local_variable
+//   var toPrepend = '';
+//   while (startRandPos == endRankPos) {
+//     toPrepend += startRankLetter[0];
+//
+//     startRankLetter = startRankLetter.substring(1);
+//     endRankLetter = endRankLetter.substring(1);
+//
+//     rankLength--;
+//
+//     if (startRankLetter.isEmpty || endRankLetter.isEmpty) {
+//       throw LexoRankException('Need to rebalance');
+//     }
+//
+//     startRandPos = startRankLetter.codeUnits.first;
+//     endRankPos = endRankLetter.codeUnits.first;
+//   }
+//
+//   final items = <String>[];
+//   for (int i = startRandPos; i < endRankPos + 1; i++) {
+//     final c = String.fromCharCode(i);
+//     items.add(List.generate(rankLength, (index) => c).join());
+//   }
+//
+//   while (items.length < sizeOfItems) {
+//     final newList = _generateBetweenTupleItems(items);
+//     items.addAll(newList);
+//     items.sort();
+//   }
+//
+//   return items.map((x) => toPrepend + x).toSet().take(sizeOfItems).toList();
+// }
