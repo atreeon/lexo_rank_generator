@@ -27,5 +27,10 @@ void main() {
       expect(lexo.getRankBetween(firstRank: 'a', secondRank: 'adjww'), equals('abryl'));
       expect(lexo.getRankBetween(firstRank: 'aa', secondRank: 'adjww'), equals('abryl'));
     });
+
+    test('when ranks are close together or close to a', () {
+      final lexo = const LexoRank();
+      expect(lexo.getRankBetween(firstRank: 'aaaa', secondRank: 'aaab'), equals('aaaan'));
+    });
   });
 }

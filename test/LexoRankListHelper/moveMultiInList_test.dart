@@ -8,7 +8,6 @@ var _personHelper = LexoRankListHelper(
   getId: (Person p) => p.id,
   getRankStr: (Person p) => p.rank,
   setRankStr: (Person p, String newRank) => p.copyWith(rank: newRank),
-  minRankLengthForNewList: 12,
 );
 
 void main() {
@@ -27,7 +26,7 @@ void main() {
           .moveMultiInList(
             people,
             [people[3]],
-            MoveDirection.up,
+            EDirection.up,
           )
           .list;
 
@@ -57,7 +56,7 @@ void main() {
           .moveMultiInList(
             people,
             [people[3], people[4], people[5]],
-            MoveDirection.up,
+            EDirection.up,
           )
           .list;
 
@@ -88,7 +87,7 @@ void main() {
           .moveMultiInList(
             people,
             [people[0], people[1]],
-            MoveDirection.down,
+            EDirection.down,
           )
           .list;
 
@@ -114,18 +113,18 @@ void main() {
         Person(3, "Doe", 28, "ccc"),
       ];
 
-      var newList = _personHelper.moveMultiInList(people, [people[0], people[1]], MoveDirection.down).list;
-      newList = _personHelper.moveMultiInList(newList, [newList[1], newList[2]], MoveDirection.up).list;
-      newList = _personHelper.moveMultiInList(newList, [newList[0], newList[1]], MoveDirection.down).list;
-      newList = _personHelper.moveMultiInList(newList, [newList[1], newList[2]], MoveDirection.up).list;
-      newList = _personHelper.moveMultiInList(newList, [newList[0], newList[1]], MoveDirection.down).list;
-      newList = _personHelper.moveMultiInList(newList, [newList[1], newList[2]], MoveDirection.up).list;
-      newList = _personHelper.moveMultiInList(newList, [newList[0], newList[1]], MoveDirection.down).list;
-      newList = _personHelper.moveMultiInList(newList, [newList[1], newList[2]], MoveDirection.up).list;
-      newList = _personHelper.moveMultiInList(newList, [newList[0], newList[1]], MoveDirection.down).list;
-      newList = _personHelper.moveMultiInList(newList, [newList[1], newList[2]], MoveDirection.up).list;
-      newList = _personHelper.moveMultiInList(newList, [newList[0], newList[1]], MoveDirection.down).list;
-      newList = _personHelper.moveMultiInList(newList, [newList[1], newList[2]], MoveDirection.up).list;
+      var newList = _personHelper.moveMultiInList(people, [people[0], people[1]], EDirection.down).list;
+      newList = _personHelper.moveMultiInList(newList, [newList[1], newList[2]], EDirection.up).list;
+      newList = _personHelper.moveMultiInList(newList, [newList[0], newList[1]], EDirection.down).list;
+      newList = _personHelper.moveMultiInList(newList, [newList[1], newList[2]], EDirection.up).list;
+      newList = _personHelper.moveMultiInList(newList, [newList[0], newList[1]], EDirection.down).list;
+      newList = _personHelper.moveMultiInList(newList, [newList[1], newList[2]], EDirection.up).list;
+      newList = _personHelper.moveMultiInList(newList, [newList[0], newList[1]], EDirection.down).list;
+      newList = _personHelper.moveMultiInList(newList, [newList[1], newList[2]], EDirection.up).list;
+      newList = _personHelper.moveMultiInList(newList, [newList[0], newList[1]], EDirection.down).list;
+      newList = _personHelper.moveMultiInList(newList, [newList[1], newList[2]], EDirection.up).list;
+      newList = _personHelper.moveMultiInList(newList, [newList[0], newList[1]], EDirection.down).list;
+      newList = _personHelper.moveMultiInList(newList, [newList[1], newList[2]], EDirection.up).list;
 
       var expected = [
         Person(1, "Rich", 30, "apflyyyyyyyy"),
@@ -153,8 +152,11 @@ void main() {
       var newList = _personHelper
           .moveMultiInList(
             people,
-            [people[3], people[4]],
-            MoveDirection.down,
+            [
+              Person(5, "Emily", 22, "bhuuuuuuuuuu"),
+              Person(6, "Michael", 40, "booooooooooo"),
+            ],
+            EDirection.down,
           )
           .list;
 
@@ -163,8 +165,8 @@ void main() {
         Person(2, "Mine", 25, "bbb"),
         Person(4, "Smith", 35, "bekxxxxxxxxx"),
         Person(3, "Doe", 28, "xxxx"),
-        Person(5, "Emily", 22, "yyyymzzzzzzz"),
-        Person(6, "Michael", 40, "zmmmgmzzzzzz"),
+        Person(5, "Emily", 22, "yyyy"),
+        Person(6, "Michael", 40, "zmml"),
       ];
 
       expect(newList.toString(), expected.toString());
@@ -182,7 +184,7 @@ void main() {
         [
           Person(3, "Doe", 28, "gggggggggggg"),
         ],
-        MoveDirection.up,
+        EDirection.up,
       );
 
       var expected = [
@@ -207,7 +209,7 @@ void main() {
           [
             Person(2, "Rich", 28, "bbb"),
           ],
-          MoveDirection.up,
+          EDirection.up,
         );
       } on LexoRankException {
         expect(true, true);
@@ -234,12 +236,40 @@ void main() {
         var result = _personHelper.moveMultiInList(
           people,
           [people[1], people[2]],
-          MoveDirection.up,
+          EDirection.up,
         );
         people = result.list;
       }
 
       expect(people[0].rank, 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaad');
+    });
+
+    test("0 move single up", () {
+      var people = [
+        Person(1, "Rich", 30, "aaa"),
+        Person(2, "Mine", 25, "bbb"),
+        Person(3, "Doe", 28, "ccc"),
+        Person(4, "Smith", 35, "ddd"),
+        Person(5, "Emily", 22, "eee"),
+        Person(6, "Michael", 40, "fff"),
+      ];
+
+      var result = _personHelper.moveMultiInList(
+        people,
+        [people[3]],
+        EDirection.up,
+      );
+
+      var expected = [
+        Person(1, "Rich", 30, "aaa"),
+        Person(2, "Mine", 25, "bbb"),
+        Person(4, "Smith", 35, "boo"),
+        Person(3, "Doe", 28, "ccc"),
+        Person(5, "Emily", 22, "eee"),
+        Person(6, "Michael", 40, "fff"),
+      ];
+
+      expect(result.list.toString(), expected.toString());
     });
   });
 }

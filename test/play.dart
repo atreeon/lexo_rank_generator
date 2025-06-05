@@ -89,7 +89,6 @@ void main() {
         getId: (Person p) => p.id,
         getRankStr: (Person p) => p.rank,
         setRankStr: (Person p, String newRank) => p.copyWith(rank: newRank),
-        minRankLengthForNewList: 12,
       );
 
       _personHelper.moveMultiInList(
@@ -97,7 +96,7 @@ void main() {
         [
           Person(2, "Rich", 28, "bbb"),
         ],
-        MoveDirection.up,
+        EDirection.up,
       );
     });
 
